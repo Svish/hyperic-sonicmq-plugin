@@ -1,0 +1,153 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>no.lemontree.hyperic.sonic</groupId>
+	<artifactId>sonic-plugin</artifactId>
+	<version>1.0</version>
+	<packaging>jar</packaging>
+
+	<name>Sonic</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<sonic.version>7.6.2</sonic.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.hyperic.hq</groupId>
+			<artifactId>hq-product</artifactId>
+			<version>4.6.6</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hyperic.hq</groupId>
+			<artifactId>hq-util</artifactId>
+			<version>4.6.6</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hyperic.hq</groupId>
+			<artifactId>hq-common</artifactId>
+			<version>4.6.6</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.0.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.progress.sonic.esb</groupId>
+			<artifactId>xq_core</artifactId>
+			<version>${sonic.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic.esb</groupId>
+			<artifactId>xq_config</artifactId>
+			<version>${sonic.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic.mq</groupId>
+			<artifactId>sonic_mgmt_client</artifactId>
+			<version>${sonic.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic.mq</groupId>
+			<artifactId>mgmt_client</artifactId>
+			<version>${sonic.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic.mq</groupId>
+			<artifactId>mgmt_config</artifactId>
+			<version>${sonic.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic.mq</groupId>
+			<artifactId>sonic_Client</artifactId>
+			<version>${sonic.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic.mq</groupId>
+			<artifactId>sonic_Crypto</artifactId>
+			<version>${sonic.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic.mq</groupId>
+			<artifactId>sonic_XMessage</artifactId>
+			<version>${sonic.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic.mq</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>${sonic.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>project.local</id>
+			<name>project</name>
+			<url>file:${project.basedir}/repo</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin> 
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/classes/lib</outputDirectory>
+							<includeScope>runtime</includeScope>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>

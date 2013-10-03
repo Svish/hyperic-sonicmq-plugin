@@ -1,0 +1,6 @@
+
+Hyperic PDK API
+http://hyperic.allrightname.com/javadoc/hq-pdk/index.html
+
+Sonic Management API
+http://documentation.progress.com/output/Sonic/8.5.0/Docs8.5/api/mgmt_api/index.html?overview-summary.html

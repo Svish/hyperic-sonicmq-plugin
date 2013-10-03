@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+
+<plugin package="${project.groupId}">		
+	<property name="PLUGIN_VERSION" value="${project.version}"/>
+
+	<filter name="connection" value="ds.domain=%ds.domain%,ds.location=%ds.location%,ds.username=%ds.username%,ds.password=%ds.password%"/>
+
+	<filter name="template" value="sonic:${connection}:${alias}" />
+
+	<server name="Sonic MQ" version="7.6.x">
+
+		<property name="HAS_BUILTIN_SERVICES" value="true"/>
+
+		<plugin type="autoinventory" class="Detector" />
+		<plugin type="collector" class="DomainCollector" />
+		<plugin type="measurement" class="Measurement" />
+
+		<metric name="Availability" indicator="true" />
+		<metric
+			name="Up Time"
+			alias="UpTime"
+			category="AVAILABILITY"
+			defaultOn="true"
+			units="ms"
+			collectionType="static" />	
+
+		<config>
+			<option 
+				name="ds.domain" 
+				description="Name of domain"
+				default="Domain1" />				
+			<option 
+				name="ds.location" 
+				description="URL(s) for connecting to the domain"
+				default="tcp://localhost:2506" />
+			<option 
+				name="ds.username" 
+				description="Admin username for the Sonic MQ server"
+				default="Administrator" />
+			<option 
+				name="ds.password" 
+				description="The admin password for the Sonic MQ server"
+				type="secret" 
+				default="Administrator" />				
+		</config>
+
+
+
+		<service name="Container">
+			<plugin type="collector" class="ContainerCollector"/>
+			<plugin type="measurement" class="Measurement"/>
+			<plugin type="autoinventory"/>
+
+
+			<config>
+				<option name="id" description="Full identity of container"/>
+			</config>
+
+			<property
+				name="template"
+				value="sonic:id=%id%,${connection}:${alias}"/>
+			<metric name="Availability" indicator="true" />
+			<metric
+				name="Up Time"
+				alias="UpTime"
+				category="AVAILABILITY"
+				defaultOn="true"
+				units="ms"
+				collectionType="static" />	
+			<metric
+				name="Current Memory Usage"
+				alias="system.memory.CurrentUsage"
+				category="UTILIZATION"
+				indicator="true"
+				units="B" />
+			<metric
+				name="Max Memory Usage"
+				alias="system.memory.MaxUsage"
+				category="UTILIZATION"
+				indicator="true"
+				units="B" />
+			<metric 
+				name="Current Thread Usage"
+				alias="system.threads.CurrentTotal"
+				category="UTILIZATION"
+				indicator="true"
+				units="B" />
+		</service>
+
+		<service name="Broker">
+			<plugin type="collector" class="BrokerCollector"/>
+			<plugin type="measurement" class="Measurement"/>
+			<plugin type="autoinventory"/>
+
+			<config>
+				<option name="id" description="Full identity of broker"/>
+			</config>
+
+			<property
+				name="template"
+				value="sonic:id=%id%,${connection}:${alias}"/>
+
+			<metric name="Availability" indicator="true" />
+			<metric
+				name="Up Time"
+				alias="UpTime"
+				category="AVAILABILITY"
+				defaultOn="true"
+				units="ms"
+				collectionType="static" />	
+			<metric 
+				name="Bytes Delivered Per Second"
+				alias="broker.bytes.DeliveredPerSecond"
+				category="THROUGHPUT"
+				indicator="true"
+				units="B" />
+			<metric 
+				name="Bytes Received Per Second"
+				alias="broker.bytes.ReceivedPerSecond"
+				category="THROUGHPUT"
+				indicator="true"
+				units="B" />
+			<metric 
+				name="Connection Count"
+				alias="broker.connections.Count"
+				category="THROUGHPUT"
+				indicator="true" />
+			<metric 
+				name="Messages Delivered"
+				alias="broker.messages.Delivered"
+				category="THROUGHPUT"
+				collectionType="trendsup"
+				indicator="true"/>
+			<metric 
+				name="Messages Received"
+				alias="broker.messages.Received"
+				category="THROUGHPUT"
+				collectionType="trendsup"
+				indicator="true"/>
+		</service>
+
+
+	</server>
+
+
+</plugin>
