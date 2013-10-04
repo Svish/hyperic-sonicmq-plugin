@@ -20,6 +20,7 @@ plugin.
 Usage
 ---
 
+1. Either download jar from releases or build from source with `mvn package`
 1. Install the plugin via the Plugin Manager
 1. Go to the platform which should monitor the domain
 1. Open Tools Menu -> New Server
@@ -27,3 +28,9 @@ Usage
 	* The install path requires a value, but isn't actually used for anything
 1. Edit the Configuration Properties of the server to define the domain, location, username and password
 
+
+Tested with
+---
+
+* Hyperic 4.6
+* SonicMQ 7.6.2
