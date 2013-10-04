@@ -20,7 +20,7 @@ plugin.
 Usage
 ---
 
-1. Either download jar from releases or build from source with `mvn package`
+1. Download jar from [releases](https://github.com/Svish/hyperic-sonicmq-plugin/releases) or build from source with `mvn package`
 1. Install the plugin via the Plugin Manager
 1. Go to the platform which should monitor the domain
 1. Open Tools Menu -> New Server
