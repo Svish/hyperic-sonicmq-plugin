@@ -18,7 +18,7 @@ public class Configuration
 	public final String password;
 	public final String id;
 	
-	
+
 	/**
 	 * Constructor used by {@link Detector}.
 	 */
@@ -43,5 +43,16 @@ public class Configuration
 		// If there's no explicit id, we assume we want the domain directory service id  
 		id = properties.getProperty("id", domain + ".DIRECTORY SERVICE:ID=DIRECTORY SERVICE");
 	}
-	
+
+	/**
+	 * Constructor used by tests.
+	 */
+	public Configuration(String domain, String location, String username, String password)
+	{
+		this.domain = domain;
+		this.location = location;
+		this.username = username;
+		this.password = password;
+		this.id = null;
+	}	
 }

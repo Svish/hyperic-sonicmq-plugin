@@ -139,6 +139,42 @@
 				indicator="true"/>
 		</service>
 
+		<service name="Queue">
+			<plugin type="collector" class="QueueCollector"/>
+			<plugin type="measurement" class="Measurement"/>
+			<plugin type="autoinventory"/>
+
+			<config>
+				<option 
+					name="broker.url" description="URL to broker" />
+				<option 
+					name="broker.username" 
+					description="Admin username for the Sonic MQ server"
+					default="Administrator" />
+				<option 
+					name="broker.password" 
+					description="The admin password for the Sonic MQ server"
+					type="secret" 
+					default="Administrator" />
+				<option 
+					name="broker.name" description="Name of queue" />
+				<option 
+					name="queue" 
+					description="Name of queue"/>
+			</config>
+
+			<property
+				name="template"
+				value="sonic:broker.url=%broker.url%,broker.name=%broker.name%,broker.username=%broker.username%,broker.password=%broker.password%,queue=%queue%,${connection}:${alias}"/>
+
+			<metric name="Availability" indicator="true" />
+			<metric 
+				name="Message Count"
+				alias="queue.messages.Count"
+				category="UTILIZATION"
+				indicator="true" />
+		</service>
+
 
 	</server>
 
