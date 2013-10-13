@@ -20,11 +20,12 @@ public class QueueCollector extends Collector
 {
 	private static Log log = LogFactory.getLog(QueueCollector.class.getName());
 
+	
 	@Override
 	public final void collect()
 	{
     	log.debug("collect invoked: "+getProperties());
-    	
+
     	setAvailability(true);
     	
 		QueueConfiguration config = new QueueConfiguration(getProperties());
@@ -47,7 +48,6 @@ public class QueueCollector extends Collector
 	        }
 	        
 	        setValue("queue.messages.Count", messageCount);
-	        log.info(config.broker+": "+messageCount);
         }
 		catch (JMSException e)
 		{
@@ -63,7 +63,7 @@ public class QueueCollector extends Collector
 	}
 
 	
-	private static class QueueConfiguration
+	public static class QueueConfiguration
 	{
 		public final String url;
 		public final String broker;
@@ -72,9 +72,6 @@ public class QueueCollector extends Collector
 		public final String queue;
 		public final Configuration ds;
 
-		/**
-		 * Constructor used by {@link DomainCollector}.
-		 */
 		public QueueConfiguration(Properties properties)
 		{
 			ds = new Configuration(properties);
@@ -85,4 +82,6 @@ public class QueueCollector extends Collector
 			queue = properties.getProperty("queue");
 		}
 	}
+	
+	
 }

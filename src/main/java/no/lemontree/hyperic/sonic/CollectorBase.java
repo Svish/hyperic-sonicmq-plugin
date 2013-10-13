@@ -38,8 +38,6 @@ public abstract class CollectorBase<TProxy> extends Collector
 			return;
 		}
 		
-		log.debug("collect invoked: "+getProperties());
-
 		Configuration config = new Configuration(getProperties());  
         JMSConnectorClient client = new JMSConnectorClient();
         try

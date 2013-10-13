@@ -18,20 +18,13 @@ import com.sonicsw.mf.mgmtapi.runtime.MFProxyFactory;
 public class ContainerCollector extends CollectorBase<IAgentProxy>
 {
 	private static Log log = LogFactory.getLog(ContainerCollector.class.getName());
-
-
-	@Override
-	protected IAgentProxy createProxy(JMSConnectorClient client, ObjectName jmxName)
-	{
-		return MFProxyFactory.createAgentProxy(client, jmxName);
-	}
-
+	
 	
 	@Override
 	public void collect(IAgentProxy proxy, Configuration config)
 	{
     	log.debug("collect invoked: "+getProperties());
-    	
+
         setAvailability(proxy.getState() == IComponentState.STATE_ONLINE);
         setValue("UpTime", proxy.getUptime());
         
@@ -46,5 +39,14 @@ public class ContainerCollector extends CollectorBase<IAgentProxy>
         IMetric[] data = proxy.getMetricsData(metrics, false).getMetrics();
         for(IMetric m : data)
         	setValue(m.getMetricIdentity().getAbsoluteName(), m.getValue());
-	}	
+	}
+
+
+	@Override
+	protected IAgentProxy createProxy(JMSConnectorClient client, ObjectName jmxName)
+	{
+		return MFProxyFactory.createAgentProxy(client, jmxName);
+	}
+
+	
 }

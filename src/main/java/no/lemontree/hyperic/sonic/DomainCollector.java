@@ -16,6 +16,16 @@ import com.sonicsw.mf.mgmtapi.runtime.MFProxyFactory;
 public class DomainCollector extends CollectorBase<IDirectoryServiceProxy>
 {
 	private static Log log = LogFactory.getLog(DomainCollector.class.getName());
+
+	
+	@Override
+	protected void collect(IDirectoryServiceProxy proxy, Configuration config)
+	{	
+    	log.debug("collect invoked: "+getProperties());
+        
+        setAvailability(proxy.getState() == IComponentState.STATE_ONLINE);
+        setValue("UpTime", proxy.getUptime());
+	}
 	
 
 	@Override
@@ -25,12 +35,4 @@ public class DomainCollector extends CollectorBase<IDirectoryServiceProxy>
 	}
 	
 
-	protected void collect(IDirectoryServiceProxy proxy, Configuration config)
-	{	
-    	log.debug("collect invoked: "+getProperties());
-        
-        setAvailability(proxy.getState() == IComponentState.STATE_ONLINE);
-        setValue("UpTime", proxy.getUptime());
-	}
-	
 }
