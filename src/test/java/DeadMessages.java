@@ -1,51 +1,42 @@
-package org.hyperic.hq.plugin.sonic;
+
 
 import static java.lang.System.*;
 
 import java.util.Enumeration;
 
-import javax.jms.Message;
+import progress.message.jclient.Message;
 import javax.jms.MessageConsumer;
 
 import progress.message.jclient.*;
 
+/**
+ * Experiment for counting dead messages
+ */
 public class DeadMessages
 {
 	public static void main(String[] args) throws Exception
 	{
-		out.print("Creating factory... ");
-		ConnectionFactory cf = (new progress.message.jclient.ConnectionFactory("tcp://esb-test1.dax.net:2800"));
-        out.println("OK");
-        
+		ConnectionFactory cf = (new progress.message.jclient.ConnectionFactory("tcp://nereus.dax.net:2800"));
         Connection connection = null;
         try
         {
-	        out.print("Creating connection... ");
 	        connection = (Connection) cf.createConnection("Administrator", "Administrator");
-	        //connection.start();
-	        out.println("OK");
-	        
-	        out.print("Creating session... ");
 	        Session session = (Session) connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
 	        Queue dmq = (Queue) session.createQueue("SonicMQ.deadMessage");
-	        out.println("OK");
-	        	        
-	        out.print("Creating browser... ");
 	        QueueBrowser browser = (QueueBrowser) session.createBrowser(dmq);
-	        out.println("OK");
-
-
-	        out.print("Counting messages");
+	        
 	        int n = 0;
+	        int size = 0;
 	        Enumeration e = browser.getEnumeration();
 	        while(e.hasMoreElements())
 	        {
-	        	e.nextElement();
+	        	Message m = (Message) e.nextElement();
 	        	n++;
-	        	out.print(".");
+	        	size += m.getBodySize();
 	        }
 	        
-	        out.println(" "+n);
+	        out.println("n        ="+n);
+	        out.println("body size="+size);
         }
         finally
         {

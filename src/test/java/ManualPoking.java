@@ -1,6 +1,8 @@
-package org.hyperic.hq.plugin.sonic;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import javax.management.ObjectName;
 
 import com.sonicsw.esb.mgmtapi.ESBAPI;
 import com.sonicsw.esb.mgmtapi.ESBAPIFactory;
@@ -17,15 +19,18 @@ import com.sonicsw.mf.mgmtapi.config.IContainerBean.IComponentsType;
 import com.sonicsw.mf.mgmtapi.config.IContainerBean.IStartupParams;
 import com.sonicsw.mf.mgmtapi.runtime.IAgentProxy;
 import com.sonicsw.mf.mgmtapi.runtime.IDirectoryServiceProxy;
+import com.sonicsw.mf.mgmtapi.runtime.MFProxyFactory;
 import com.sonicsw.mq.common.runtime.IQueueData;
 import com.sonicsw.mq.mgmtapi.config.*;
 import com.sonicsw.mq.mgmtapi.config.IClusterBean.IClusterMembers;
 import com.sonicsw.mq.mgmtapi.config.IQueuesBean.IQueueAttributes;
 import com.sonicsw.mq.mgmtapi.config.IQueuesBean.IQueuesSetType;
 import com.sonicsw.mq.mgmtapi.runtime.IBrokerProxy;
+import com.sonicsw.mq.mgmtapi.runtime.MQProxyFactory;
+import com.sonicsw.mx.config.IAttributeMap;
 
 
-public final class ManualPoking
+public class ManualPoking
 {
 	private static final class MetricComparator implements Comparator<IMetric>
 	{
@@ -78,9 +83,9 @@ public final class ManualPoking
             factory.connect(domain, urls, user, pass);
 	        
 	        // Directory Service
-            if(1==1)
+            if(1==2)
             {
-	            IDirectoryServiceProxy ds = Common.getDirectoryServiceProxy(client, domain); 
+	            IDirectoryServiceProxy ds = getDirectoryServiceProxy(client, domain); 
 	            
 	            p("-- Domain (metrics) --");
 	            p("Domain=", ds.getDomain());
@@ -91,10 +96,10 @@ public final class ManualPoking
             
 
             // Container?
-            if(1==1)
+            if(1==2)
             {
 	            p("-- Container (metrics) --");
-                IAgentProxy agent = Common.getAgentProxy(client, domain, "ctbrData1");
+                IAgentProxy agent = getAgentProxy(client, domain, "ctbrData1");
                 p("State=", agent.getStateString());
 
                 IMetricIdentity[] metrics = new IMetricIdentity[] {
@@ -113,10 +118,10 @@ public final class ManualPoking
             
             
             // Broker
-            if(1==1)
+            if(1==2)
             {
 	            p("-- Broker (metrics) --");
-	            IBrokerProxy broker = Common.getBrokerProxy(client, domain, "ctbrData1", "brData1");
+	            IBrokerProxy broker = getBrokerProxy(client, domain, "ctbrData1", "brData1");
 	            p("State=", broker.getStateString());
 	            
 
@@ -145,7 +150,7 @@ public final class ManualPoking
             
             
             
-            if(1==1)
+            if(1==2)
             {
 	            p("-- Clusters (mgmt) --");
 	            for(String name : (Collection<String>)factory.getClusterBeanNames())
@@ -191,7 +196,7 @@ public final class ManualPoking
 	            }
             }
             
-            if(1==1)
+            if(1==2)
 			{
                 p("-- Containers (mgmt) --");
 				for(String name : (Collection<String>)factory.getContainerBeanNames())
@@ -234,7 +239,18 @@ public final class ManualPoking
 				for(String name : (Collection<String>)factory.getBrokerBeanNames())
 				{
 					IBrokerBean broker = factory.getBrokerBean(name);
+					
 					p(broker.getBrokerName(), " (cluster=", broker.getClusterBean().getClusterName(), ")");
+					
+					IMgmtBeanBase bean = broker
+						.getAcceptorsBean()
+						.getDefaultAcceptors()
+						.getPrimaryAcceptorRef();
+					if(bean instanceof IAcceptorTcpsBean)
+					{
+						IAcceptorTcpsBean acceptor = (IAcceptorTcpsBean) bean;
+						p("\t", "Primary Acceptor URL: ", acceptor.getAcceptorUrl());
+					}
 					
 					IQueuesBean queuesBean = broker.getQueuesBean();
 					IQueuesSetType queues = queuesBean.getQueues();
@@ -247,8 +263,25 @@ public final class ManualPoking
 					}
 				}
 			}
+            
+            if(1==2)
+			{
+                p("-- All Brokers (mgmt) --");
+                ArrayList<String> brokers = new ArrayList<String>();
+                brokers.addAll((Collection<String>) factory.listConfigElements("MQ_BROKER"));
+                brokers.addAll((Collection<String>) factory.listConfigElements("MQ_BACKUPBROKER"));
+                
+				for(String name : brokers)
+				{
+					IMgmtBeanBase bean = factory.getBean(name + "/_Default");
+					p(name, "\t", bean.getClass().getSimpleName());
+					//pm("\t", bean);
+				}
+			}
+            
+            
 
-            if(1==1)
+            if(1==2)
             {
                 p("-- Container Collections (mgmt) --");
 	            for(String name : (Collection<String>)factory.getContainerCollectionBeanNames())
@@ -302,8 +335,62 @@ public final class ManualPoking
 		System.out.println();
 	}
 	
+	@SuppressWarnings({ "unused", "unchecked" })
+	private static void pm(String prefix, IAttributeMap map)
+	{
+		if(map == null)
+			return;
+		
+		for(String n : (Set<String>) map.getAttributeNames())
+		{
+			Object attribute = map.getAttribute(n);
+			if(false && attribute instanceof IAttributeMap)
+			{
+				System.out.println(prefix + n);
+				pm(prefix + prefix, (IAttributeMap) attribute);
+			}
+			else
+			{
+				System.out.println(prefix + n + "=" + attribute.getClass());
+			}
+		}
+	}
+	
 	private static void pf(String format, Object... args)
 	{
 		System.out.println(String.format(format, args));
 	}
+	
+    /**
+     * Gets a management proxy for the Directory Service component; the DS component is used to
+     * manage the domain configuration store.
+     */
+    public static IDirectoryServiceProxy getDirectoryServiceProxy(JMSConnectorClient connector, String domain)
+    throws Exception
+    {
+        ObjectName jmxName = new ObjectName(domain + ".DIRECTORY SERVICE:ID=DIRECTORY SERVICE");
+        return MFProxyFactory.createDirectoryServiceProxy(connector, jmxName);
+    }
+    
+    
+    /**
+     * Gets a management proxy for an AGENT component; the AGENT component is used to
+     * manage a container.
+     */
+    public static IAgentProxy getAgentProxy(JMSConnectorClient connector, String domain, String container)
+    throws Exception
+    {
+        ObjectName jmxName = new ObjectName(domain + "." + container + ":ID=AGENT");
+        return MFProxyFactory.createAgentProxy(connector, jmxName);
+    }
+
+    /**
+     * Gets a management proxy for a SOnicMQ broker component.
+     */
+    public static IBrokerProxy getBrokerProxy(JMSConnectorClient connector, String domain, String container, String id)
+    throws Exception
+    {
+        ObjectName jmxName = new ObjectName(domain + "." + container + ":ID=" + id);
+        return MQProxyFactory.createBrokerProxy(connector, jmxName);
+    }
 }
