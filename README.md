@@ -4,7 +4,7 @@ Hyperic SonicMQ plugin
 Hyperic plugin for monitoring SonicMQ domains.
 
 
-Notes
+Note
 ---
 
 The plugin was created to monitor a clustered setup, which means it's thought to be run by 
@@ -15,6 +15,10 @@ still work if any of the hosts in the clusters goes down.
 This is also why the plugin only monitors metrics collected from the Sonic domain as I'm not 
 sure how to monitor Java VM metrics and such remotely or how to do so nicely in a Hyperic
 plugin.
+
+You should have agents monitoring the actual platforms in addition to this. If you don't,
+you'll be blind in relation to usage of CPU, memory, network and other metrics which can
+affect your setup quite harshly if not paid attention to ;)
 
 
 Usage
