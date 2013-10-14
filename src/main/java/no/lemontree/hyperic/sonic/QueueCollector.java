@@ -1,7 +1,5 @@
 package no.lemontree.hyperic.sonic;
 
-import static java.lang.System.*;
-
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -51,7 +49,7 @@ public class QueueCollector extends Collector
         }
 		catch (JMSException e)
 		{
-			log.debug("Failed to get metrics for "+config.broker+":"+config.queue+" @ "+config.url+": "+e.getMessage());
+			log.warn("Failed to get metrics for "+config.broker+":"+config.queue+" @ "+config.url+": "+e.getMessage());
 			setAvailability(false);
 		}
         finally

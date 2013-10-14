@@ -55,7 +55,7 @@ public abstract class CollectorBase<TProxy> extends Collector
 		catch(ProxyRuntimeException e)
 		{
 			// Happens when whatever we're poking at is down
-			log.debug("Failed to get metrics for "+config.id+" @ "+config.location+": "+e.getMessage());
+			log.warn("Failed to get metrics for "+config.id+" @ "+config.location+": "+e.getMessage());
 			setAvailability(false);
 		}
         finally

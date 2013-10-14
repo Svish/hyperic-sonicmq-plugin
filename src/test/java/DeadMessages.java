@@ -4,9 +4,6 @@ import static java.lang.System.*;
 
 import java.util.Enumeration;
 
-import progress.message.jclient.Message;
-import javax.jms.MessageConsumer;
-
 import progress.message.jclient.*;
 
 /**
@@ -16,7 +13,7 @@ public class DeadMessages
 {
 	public static void main(String[] args) throws Exception
 	{
-		ConnectionFactory cf = (new progress.message.jclient.ConnectionFactory("tcp://nereus.dax.net:2800"));
+		ConnectionFactory cf = new ConnectionFactory("tcp://glaucus.dax.net:2800");
         Connection connection = null;
         try
         {
@@ -35,7 +32,7 @@ public class DeadMessages
 	        	size += m.getBodySize();
 	        }
 	        
-	        out.println("n        ="+n);
+	        out.println("count    ="+n);
 	        out.println("body size="+size);
         }
         finally
