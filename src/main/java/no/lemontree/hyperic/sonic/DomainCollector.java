@@ -1,38 +1,24 @@
 package no.lemontree.hyperic.sonic;
 
-import javax.management.ObjectName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.sonicsw.mf.common.runtime.IComponentState;
-import com.sonicsw.mf.jmx.client.JMSConnectorClient;
-import com.sonicsw.mf.mgmtapi.runtime.IDirectoryServiceProxy;
-import com.sonicsw.mf.mgmtapi.runtime.MFProxyFactory;
+import no.lemontree.sonic.DomainProxyClient;
 
 /**
- * Collector for domain/directory service metrics.
+ * Hyperic collector for domain/directory service.
  */
-public class DomainCollector extends CollectorBase<IDirectoryServiceProxy>
+public class DomainCollector extends CollectorBase<no.lemontree.sonic.DomainCollector>
 {
-	private static Log log = LogFactory.getLog(DomainCollector.class.getName());
-
-	
 	@Override
-	protected void collect(IDirectoryServiceProxy proxy, Configuration config)
-	{	
-    	log.debug("collect invoked: "+getProperties());
-        
-        setAvailability(proxy.getState() == IComponentState.STATE_ONLINE);
-        setValue("UpTime", proxy.getUptime());
-	}
-	
-
-	@Override
-	protected IDirectoryServiceProxy createProxy(JMSConnectorClient client, ObjectName jmxName)
+	protected no.lemontree.sonic.DomainCollector createCollector()
 	{
-		return MFProxyFactory.createDirectoryServiceProxy(client, jmxName);
+		DomainProxyClient client = new DomainProxyClient(getProperties());
+		client.connect(getTimeoutMillis());
+		try
+		{
+			return new no.lemontree.sonic.DomainCollector(client);	
+		}
+		finally
+		{
+			client.disconnect();
+		}
 	}
-	
-
 }

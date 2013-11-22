@@ -2,7 +2,7 @@ package no.lemontree.hyperic.sonic;
 
 import java.util.ArrayList;
 
-import no.lemontree.hyperic.sonic.detect.DomainScanner;
+import no.lemontree.sonic.config.DomainOptions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,7 +22,6 @@ public class Detector extends ServerDetector
 {
 	private static Log log = LogFactory.getLog(Detector.class.getName());
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	protected ArrayList<ServiceResource> discoverServices(ConfigResponse config) throws PluginException
 	{
@@ -30,7 +29,7 @@ public class Detector extends ServerDetector
 		
         try
 		{
-			DomainScanner ds = new DomainScanner(this, new Configuration(config));
+			DomainScanner ds = new DomainScanner(this, new DomainOptions(config.toProperties()));
 			
 			return ds.findServices();
 		}

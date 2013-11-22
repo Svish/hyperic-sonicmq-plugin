@@ -1,9 +1,11 @@
-package no.lemontree.hyperic.sonic.detect;
+package no.lemontree.hyperic.sonic;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import no.lemontree.hyperic.sonic.Configuration;
+
+import no.lemontree.sonic.config.DomainOptions;
+import no.lemontree.sonic.config.Options;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,11 +24,11 @@ public class DomainScanner
 {
 	private static Log log = LogFactory.getLog(DomainScanner.class.getName());
 	
-	private final Configuration config;
+	private final DomainOptions config;
 	private final GenericPlugin plugin;
 	
 
-	public DomainScanner(GenericPlugin plugin, Configuration config)
+	public DomainScanner(GenericPlugin plugin, DomainOptions config)
 	{
 		this.plugin = plugin;
 		this.config = config;
@@ -75,7 +77,7 @@ public class DomainScanner
 							// Look for dead message queue
 							try
 							{
-								QueueResource q = new QueueResource(ref, componentName);
+								QueueResource q = new QueueResource(ref, componentName, container);
 								services.add(q);
 								logDiscovery(q);
 							}
@@ -110,7 +112,7 @@ public class DomainScanner
 			String name = container.getContainerName();
 			
 			ConfigResponse c = new ConfigResponse();
-        	c.setValue("id", config.domain+"."+name+":ID=AGENT");
+        	c.setValue(Options.Container.Id, config.domain+"."+name+":ID=AGENT");
 
     		setType(plugin, "Container");
 			setName(config.domain + " " + name);
@@ -125,7 +127,7 @@ public class DomainScanner
 		public BrokerResource(String name, IContainerBean container) throws MgmtException
 		{
         	ConfigResponse c = new ConfigResponse();
-        	c.setValue("id", config.domain+"."+container.getContainerName()+":ID="+name);
+        	c.setValue(Options.Broker.Id, config.domain+"."+container.getContainerName()+":ID="+name);
 
     		setType(plugin, "Broker");
 			setName(config.domain + " " + name);
@@ -137,24 +139,24 @@ public class DomainScanner
 	
 	private class QueueResource extends MyResource
 	{
-		public QueueResource(IMgmtBeanBase bean, String brokerName) throws MgmtException
+		public QueueResource(IMgmtBeanBase brokerBean, String brokerName, IContainerBean container) throws MgmtException
 		{
 			//NOTE: Yes, this is annoying, but broker and backup broker doesn't share an interface... 
-			IAcceptorTcpsBean tcpAcceptor = bean instanceof IBrokerBean
-				? getDefaultAcceptor((IBrokerBean)bean)
-				: getDefaultAcceptor((IBackupBrokerBean)bean);
+			IAcceptorTcpsBean tcpAcceptor = brokerBean instanceof IBrokerBean
+				? getDefaultAcceptor((IBrokerBean)brokerBean)
+				: getDefaultAcceptor((IBackupBrokerBean)brokerBean);
 
 			String name = "SonicMQ.deadMessage";
-				
-			if( ! getQueues(bean).getQueues().getKeyNames().contains(name))
+			
+			if( ! getQueues(brokerBean).getQueues().getKeyNames().contains(name))
 				throw new UnsupportedOperationException("Could not find expected queue named '"+name+"' in broker '"+brokerName+"'.");
 			
         	ConfigResponse c = new ConfigResponse();
-        	c.setValue("broker.url", tcpAcceptor.getAcceptorUrl());
-        	c.setValue("broker.username", config.username);
-        	c.setValue("broker.password", config.password);
-        	c.setValue("broker.name", brokerName);
-        	c.setValue("queue", name);
+        	c.setValue(Options.Queue.Id, config.domain+"."+container.getContainerName()+":ID="+brokerName);
+        	c.setValue(Options.Queue.BrokerUrl, tcpAcceptor.getAcceptorUrl());
+        	c.setValue(Options.Queue.BrokerUsername, config.username);
+        	c.setValue(Options.Queue.BrokerPassword, config.password);
+        	c.setValue(Options.Queue.Name, name);
 
     		setType(plugin, "Queue");    			
 			setName(config.domain + " " + brokerName + " " + name);
@@ -195,10 +197,11 @@ public class DomainScanner
 	}
 
 	private void logDiscovery(ServiceResource resource)
-	{	
-		log.info(String.format("Discovered %s: %s", 
+	{
+		log.info(String.format("Discovered %s: %s\n\t%s", 
 			resource.getType(),
-			resource.getName()));
+			resource.getName(),
+			resource.getProductConfig()));
 	}
 	
 	private static class MyResource extends ServiceResource

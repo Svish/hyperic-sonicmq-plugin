@@ -1,31 +1,21 @@
 package no.lemontree.hyperic.sonic;
 
-import java.util.Hashtable;
-
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hyperic.hq.product.Collector;
-
-import com.sonicsw.mf.jmx.client.JMSConnectorAddress;
-import com.sonicsw.mf.jmx.client.JMSConnectorClient;
-import com.sonicsw.mf.mgmtapi.runtime.ProxyRuntimeException;
 
 /**
  * Base class for collectors.
  * 
  * @param <TProxy> Type of proxy used by collector
  */
-public abstract class CollectorBase<TProxy> extends Collector
+public abstract class CollectorBase<TCollector extends no.lemontree.sonic.Collector> extends Collector
 {
 	private static Log log = LogFactory.getLog(CollectorBase.class.getName());
-
 	
-	protected abstract void collect(TProxy proxy, Configuration config);
-	protected abstract TProxy createProxy(JMSConnectorClient client, ObjectName jmxName);
-	
+	protected abstract TCollector createCollector();
 	
 	@Override
 	public final void collect()
@@ -37,48 +27,20 @@ public abstract class CollectorBase<TProxy> extends Collector
 			log.info("collect invoked without properties. Ignoring...");
 			return;
 		}
-		
-		Configuration config = new Configuration(getProperties());  
-        JMSConnectorClient client = new JMSConnectorClient();
         try
 		{
-        	Hashtable<String, String> env = new Hashtable<String, String>();
-            env.put("ConnectionURLs", config.location);
-            env.put("DefaultUser", config.username);
-            env.put("DefaultPassword", config.password);
-	        client.connect(new JMSConnectorAddress(env), getTimeoutMillis());
-	        
-	        TProxy proxy = getProxy(client, config.id);
-	        
-			collect(proxy, config);
+    		TCollector collector = createCollector();
+    		
+    		for(Map.Entry<String, Double> metric : collector.getMetrics().entrySet())
+    			setValue(metric.getKey(), metric.getValue());
+    		setAvailability(collector.getAvailability());
 		}
-		catch(ProxyRuntimeException e)
+		catch(Exception e)
 		{
-			// Happens when whatever we're poking at is down
-			log.warn("Failed to get metrics for "+config.id+" @ "+config.location+": "+e.getMessage());
 			setAvailability(false);
-		}
-        finally
-        {
-        	client.disconnect();
-        }
-	}
-	
-	protected final TProxy getProxy(JMSConnectorClient client, String id)
-	{
-		try
-		{
-			ObjectName jmxName = new ObjectName(id);
-			return createProxy(client, jmxName);
-		}
-		catch (MalformedObjectNameException e)
-		{
-			// Shouldn't happen...
-			log.error("Failed to create proxy: "+e.getMessage());
-			throw new RuntimeException(e);
+			
+			log.debug(getClass().getSimpleName() + " failed to get metrics. " + getProperties());
+			log.warn(e,e);
 		}
 	}
-
-	
-
 }

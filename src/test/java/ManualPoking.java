@@ -118,11 +118,13 @@ public class ManualPoking
             
             
             // Broker
-            if(1==2)
+            if(1==1)
             {
 	            p("-- Broker (metrics) --");
-	            IBrokerProxy broker = getBrokerProxy(client, domain, "ctbrData1", "brData1");
+	            IBrokerProxy broker = getBrokerProxy(client, domain, "ctbrData1Bak", "brData1Bak");
 	            p("State=", broker.getStateString());
+	            p("Replication State=", broker.getReplicationStateString());
+	            p("Replication Type=", broker.getReplicationType());
 	            
 
                 IMetricIdentity[] metrics = new IMetricIdentity[] {
@@ -142,9 +144,12 @@ public class ManualPoking
                 for(IMetric m : data)
                 	p(m.getMetricIdentity().getAbsoluteName(), "=", m.getValue());
 	            
-                ArrayList<IQueueData> queues = broker.getQueues("Q.");
-                for(IQueueData q : queues)
-                	p("\t", q.isClusteredQueue(), "\t", q.getMessageCount(), "\t", q.getTotalMessageSize(), "\t", q.getQueueName());
+                if(broker.getReplicationType().equals("PRIMARY"))
+                {
+	                ArrayList<IQueueData> queues = broker.getQueues("Q.");
+	                for(IQueueData q : queues)
+	                	p("\t", q.isClusteredQueue(), "\t", q.getMessageCount(), "\t", q.getTotalMessageSize(), "\t", q.getQueueName());
+                }
                 
             }
             
@@ -233,7 +238,7 @@ public class ManualPoking
 			}
             
 
-            if(1==1)
+            if(1==2)
 			{
                 p("-- Brokers (mgmt) --");
 				for(String name : (Collection<String>)factory.getBrokerBeanNames())
