@@ -1,0 +1,27 @@
+# Domain for all integration tests
+ds.domain=
+ds.location=
+ds.username=Administrator
+ds.password=Administrator
+
+# General broker
+broker.username=Administrator
+broker.password=Administrator
+
+# A broker that is PRIMARY
+primaryBroker.url=
+primaryBroker.id=
+
+# A broker that is BACKUP
+backupBroker.url=
+backupBroker.id=
+
+# A broker that is down or doesn't exist
+noBroker.url=
+noBroker.id=
+
+# A container 
+container.id=
+
+# Queue
+queue=SonicMQ.deadMessage
