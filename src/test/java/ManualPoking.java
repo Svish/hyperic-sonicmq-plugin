@@ -1,4 +1,3 @@
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -42,23 +41,8 @@ public class ManualPoking
 		}
 	}
 	
-	//public static final String urls = "tcp://mwtest.nwn.no:3000";
-	//public static final String domain = "dmNetworkNorway";
-
-	//public static final String urls = "tcp://miwa1.nwn.no:3000,miwa2.nwn.no:3010";
-	//public static final String domain = "dmNetworkNorway";
-
-	//public static final String urls = "tcp://esb-dev.dax.net:2610";
-	//public static final String domain = "tele2-dev";
-	
-	public static final String urls = "tcp://esb-test1.dax.net:2610,tcp://esb-test2.dax.net:2610";
-	public static final String domain = "tele2-test";
-	
-	//public static final String urls = "tcp://nereus.dax.net:2610,tcp://glaucus.dax.net:2610";
-	//public static final String domain = "tele2-prod";
-	
-	//public static final String urls = "tcp://localhost:2506";
-	//public static final String domain = "Domain1";
+	public static final String urls = "tcp://localhost:2506";
+	public static final String domain = "Domain1";
 	
 	public static final String user = "Administrator";
 	public static final String pass = "Administrator";
