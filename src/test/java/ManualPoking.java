@@ -41,8 +41,8 @@ public class ManualPoking
 		}
 	}
 	
-	public static final String urls = "tcp://localhost:2506";
-	public static final String domain = "Domain1";
+	public static final String urls = "tcp://glaucus.dax.net:2610";
+	public static final String domain = "tele2-prod";
 	
 	public static final String user = "Administrator";
 	public static final String pass = "Administrator";
@@ -105,11 +105,11 @@ public class ManualPoking
             if(1==1)
             {
 	            p("-- Broker (metrics) --");
-	            IBrokerProxy broker = getBrokerProxy(client, domain, "ctbrData1Bak", "brData1Bak");
+	            IBrokerProxy broker = getBrokerProxy(client, domain, "ctbrData1", "brData1");
 	            p("State=", broker.getStateString());
 	            p("Replication State=", broker.getReplicationStateString());
 	            p("Replication Type=", broker.getReplicationType());
-	            
+	                        
 
                 IMetricIdentity[] metrics = new IMetricIdentity[] {
                 		IBrokerProxy.BROKER_BYTES_DELIVEREDPERSECOND_METRIC_ID,
@@ -130,7 +130,13 @@ public class ManualPoking
 	            
                 if(broker.getReplicationType().equals("PRIMARY"))
                 {
-	                ArrayList<IQueueData> queues = broker.getQueues("Q.");
+	                ArrayList<IQueueData> queues = broker.getQueues("SonicMQ.deadMessage");
+	                Collections.sort(queues, new Comparator<IQueueData>() {
+		                public int compare(IQueueData arg0, IQueueData arg1)
+		                {
+		                	return arg0.getQueueName().compareTo(arg1.getQueueName());
+		                }
+	                });
 	                for(IQueueData q : queues)
 	                	p("\t", q.isClusteredQueue(), "\t", q.getMessageCount(), "\t", q.getTotalMessageSize(), "\t", q.getQueueName());
                 }

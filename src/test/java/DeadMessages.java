@@ -13,7 +13,7 @@ public class DeadMessages
 {
 	public static void main(String[] args) throws Exception
 	{
-		ConnectionFactory cf = new ConnectionFactory("tcp://glaucus.dax.net:2800");
+		ConnectionFactory cf = new ConnectionFactory("tcp://nereus.dax.net:2800");
         Connection connection = null;
         try
         {
@@ -24,6 +24,7 @@ public class DeadMessages
 	        
 	        int n = 0;
 	        int size = 0;
+	        int streamSize = 0;
 	        Enumeration e = browser.getEnumeration();
 	        while(e.hasMoreElements())
 	        {
@@ -34,6 +35,7 @@ public class DeadMessages
 	        
 	        out.println("count    ="+n);
 	        out.println("body size="+size);
+	        out.println("stream size="+streamSize);
         }
         finally
         {

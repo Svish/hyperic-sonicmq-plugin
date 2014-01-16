@@ -73,18 +73,6 @@ public class DomainScanner
 							BrokerResource b = new BrokerResource(componentName, container);
 							services.add(b);
 							logDiscovery(b);
-							
-							// Look for dead message queue
-							try
-							{
-								QueueResource q = new QueueResource(ref, componentName, container);
-								services.add(q);
-								logDiscovery(q);
-							}
-							catch(UnsupportedOperationException e)
-							{
-								log.warn(e.getMessage());
-							}
 						}
 					}
 					catch(MgmtException e)
@@ -134,65 +122,6 @@ public class DomainScanner
 			setProductConfig(c);
 			setMeasurementConfig();
 			setControlConfig();
-		}
-	}
-	
-	private class QueueResource extends MyResource
-	{
-		public QueueResource(IMgmtBeanBase brokerBean, String brokerName, IContainerBean container) throws MgmtException
-		{
-			//NOTE: Yes, this is annoying, but broker and backup broker doesn't share an interface... 
-			IAcceptorTcpsBean tcpAcceptor = brokerBean instanceof IBrokerBean
-				? getDefaultAcceptor((IBrokerBean)brokerBean)
-				: getDefaultAcceptor((IBackupBrokerBean)brokerBean);
-
-			String name = "SonicMQ.deadMessage";
-			
-			if( ! getQueues(brokerBean).getQueues().getKeyNames().contains(name))
-				throw new UnsupportedOperationException("Could not find expected queue named '"+name+"' in broker '"+brokerName+"'.");
-			
-        	ConfigResponse c = new ConfigResponse();
-        	c.setValue(Options.Queue.Id, config.domain+"."+container.getContainerName()+":ID="+brokerName);
-        	c.setValue(Options.Queue.BrokerUrl, tcpAcceptor.getAcceptorUrl());
-        	c.setValue(Options.Queue.BrokerUsername, config.username);
-        	c.setValue(Options.Queue.BrokerPassword, config.password);
-        	c.setValue(Options.Queue.Name, name);
-
-    		setType(plugin, "Queue");    			
-			setName(config.domain + " " + brokerName + " " + name);
-			setProductConfig(c);
-			setMeasurementConfig();
-			setControlConfig();
-		}
-
-		
-		private IQueuesBean getQueues(IMgmtBeanBase broker) throws MgmtException
-		{
-			return broker instanceof IBrokerBean
-				? ((IBrokerBean) broker).getQueuesBean()
-				: ((IBackupBrokerBean) broker).getPrimaryBrokerBean().getQueuesBean();
-		}
-
-		private IAcceptorTcpsBean getDefaultAcceptor(IBackupBrokerBean broker) throws MgmtException
-		{
-			return getDefaultAcceptor(broker.getAcceptorsBean());
-		}
-
-		private IAcceptorTcpsBean getDefaultAcceptor(IBrokerBean broker) throws MgmtException
-		{
-			return getDefaultAcceptor(broker.getAcceptorsBean());
-		}
-		
-		private IAcceptorTcpsBean getDefaultAcceptor(IAcceptorsBean acceptors) throws MgmtException
-		{
-			IMgmtBeanBase acceptor = acceptors
-				.getDefaultAcceptors()
-				.getPrimaryAcceptorRef();
-			
-			if(acceptor instanceof IAcceptorTcpsBean)
-				return (IAcceptorTcpsBean) acceptor;
-			
-			throw new UnsupportedOperationException("Default broker acceptor is expected be of type TCP.");
 		}
 	}
 

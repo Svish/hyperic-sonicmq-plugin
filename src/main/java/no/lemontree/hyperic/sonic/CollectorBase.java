@@ -39,8 +39,8 @@ public abstract class CollectorBase<TCollector extends no.lemontree.sonic.Collec
 		{
 			setAvailability(false);
 			
-			log.debug(getClass().getSimpleName() + " failed to get metrics. " + getProperties());
-			log.warn(e,e);
+			log.info(getClass().getSimpleName() + " failed to get metrics. " + getProperties());
+			log.debug(e,e);
 		}
 	}
 }

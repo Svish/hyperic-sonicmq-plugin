@@ -1,8 +1,11 @@
 package no.lemontree.sonic;
 
+import java.util.ArrayList;
+
 import com.sonicsw.mf.common.metrics.IMetric;
 import com.sonicsw.mf.common.metrics.IMetricIdentity;
 import com.sonicsw.mf.common.runtime.IComponentState;
+import com.sonicsw.mq.common.runtime.IQueueData;
 import com.sonicsw.mq.mgmtapi.runtime.IBrokerProxy;
 
 public class BrokerCollector extends Collector
@@ -30,8 +33,18 @@ public class BrokerCollector extends Collector
         IMetric[] data = proxy.getMetricsData(metrics, false).getMetrics();
         for(IMetric m : data)
         	setMetric(m.getMetricIdentity().getAbsoluteName(), m.getValue());
+        
+        if("PRIMARY".equals(proxy.getReplicationType()))
+        {
+            ArrayList deadMessageQueue = proxy.getQueues("SonicMQ.deadMessage");
+            if(deadMessageQueue.size() == 1)
+            {
+            	IQueueData q = (IQueueData) deadMessageQueue.get(0);
+            	setMetric(Metrics.Broker.DmqCount, q.getMessageCount());
+            	setMetric(Metrics.Broker.DmqSize, q.getTotalMessageSize());
+            }	
+        }
 	    
-		// NOTE: Seems Hyperic requires metrics to be doubles
 	    setMetric(Metrics.Broker.IsPrimary, "PRIMARY".equals(proxy.getReplicationType()) ? IsPrimary : IsBackup);
 	    setMetric(Metrics.Broker.ReplicationState, proxy.getReplicationState());
 	    setMetric(Metrics.Broker.UpTime, proxy.getUptime());

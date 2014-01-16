@@ -30,6 +30,8 @@ public final class Metrics
 		public static final String UpTime = "UpTime";
 		public static final String ReplicationState = "ReplicationState";
 		public static final String IsPrimary = "IsPrimary";
+		public static final String DmqSize = "DmqSize";
+		public static final String DmqCount = "DmqCount";
 		public static final String BytesDeliveredPerSecond = "broker.bytes.DeliveredPerSecond";
 		public static final String BytesReceivedPerSecond = "broker.bytes.ReceivedPerSecond";
 		public static final String ConnectionCount = "broker.connections.Count";

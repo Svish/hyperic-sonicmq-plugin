@@ -27,6 +27,8 @@ public class ITBrokerCollector
 		assertTrue("Domain should be available", dc.getAvailability());
 		assertThat(metrics, hasKey(Metrics.Broker.UpTime));
 		assertThat(metrics, hasEntry(Metrics.Broker.IsPrimary, BrokerCollector.IsPrimary));
+		assertThat(metrics, hasKey(Metrics.Broker.DmqCount));
+		assertThat(metrics, hasKey(Metrics.Broker.DmqSize));
 		assertThat(metrics, hasKey(Metrics.Broker.BytesDeliveredPerSecond));
 		assertThat(metrics, hasKey(Metrics.Broker.BytesReceivedPerSecond));
 		assertThat(metrics, hasKey(Metrics.Broker.MessagesReceived));

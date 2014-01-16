@@ -14,6 +14,7 @@
 		<plugin type="autoinventory" class="Detector" />
 		<plugin type="collector" class="DomainCollector" />
 		<plugin type="measurement" class="Measurement" />
+		<plugin type="control" class="Control" />
 
 		<metric name="Availability" indicator="true" />
 		<metric
@@ -50,6 +51,7 @@
 			<plugin type="collector" class="ContainerCollector"/>
 			<plugin type="measurement" class="Measurement"/>
 			<plugin type="autoinventory"/>
+			<plugin type="control" class="Control" />
 
 
 			<config>
@@ -91,6 +93,7 @@
 			<plugin type="collector" class="BrokerCollector"/>
 			<plugin type="measurement" class="Measurement"/>
 			<plugin type="autoinventory"/>
+			<plugin type="control" class="Control" />
 
 			<config>
 				<option name="id" description="Full identity of broker"/>
@@ -112,16 +115,26 @@
 				name="Replication State"
 				alias="ReplicationState"
 				category="AVAILABILITY"
-				defaultOn="false"
+				defaultOn="true"
 				units="none"
 				collectionType="static" />
 			<metric
 				name="Is primary"
 				alias="IsPrimary"
 				category="AVAILABILITY"
-				defaultOn="false"
+				defaultOn="true"
 				units="none"
 				collectionType="static" />
+				
+			<metric 
+				name="Dead Message Count"
+				alias="DmqCount"
+				indicator="true" />
+			<metric 
+				name="Dead Message Total Size"
+				alias="DmqSize"
+				indicator="true"
+				units="B" />
 				
 			<metric 
 				name="Bytes Delivered Per Second"
@@ -153,45 +166,6 @@
 				collectionType="trendsup"
 				indicator="true"/>
 		</service>
-
-		<service name="Queue">
-			<plugin type="collector" class="QueueCollector"/>
-			<plugin type="measurement" class="Measurement"/>
-			<plugin type="autoinventory"/>
-
-			<config>
-				<option 
-					name="id" 
-					description="Full identity of broker"/>
-				<option 
-					name="broker.url" 
-					description="URL to broker acceptor" />
-				<option 
-					name="broker.username" 
-					description="Admin username for the Sonic MQ server"
-					default="Administrator" />
-				<option 
-					name="broker.password" 
-					description="The admin password for the Sonic MQ server"
-					type="secret" 
-					default="Administrator" />
-				<option 
-					name="queue" 
-					description="Name of queue"/>
-			</config>
-
-			<property
-				name="template"
-				value="sonic:id=%id%,queue=%queue%,broker.url=%broker.url%,broker.username=%broker.username%,broker.password=%broker.password%,${connection}:${alias}"/>
-
-			<metric name="Availability" indicator="true" />
-			<metric 
-				name="Message Count"
-				alias="queue.messages.Count"
-				category="UTILIZATION"
-				indicator="true" />
-		</service>
-
 
 	</server>
 

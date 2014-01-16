@@ -30,6 +30,6 @@ public class ITDomainScanner
 			types.add(s.getClass());
 		
 		// NOTE: No idea what's actually in the domain, but we should at least discover one of each service type
-		assertEquals(3, types.size());
+		assertEquals(2, types.size());
 	}
 }
