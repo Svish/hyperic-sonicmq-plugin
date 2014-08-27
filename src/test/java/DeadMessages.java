@@ -13,7 +13,7 @@ public class DeadMessages
 {
 	public static void main(String[] args) throws Exception
 	{
-		ConnectionFactory cf = new ConnectionFactory("tcp://nereus.dax.net:2800");
+		ConnectionFactory cf = new ConnectionFactory("tcp://localhost:2506");
         Connection connection = null;
         try
         {
