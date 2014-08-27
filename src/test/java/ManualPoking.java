@@ -41,8 +41,8 @@ public class ManualPoking
 		}
 	}
 	
-	public static final String urls = "tcp://glaucus.dax.net:2610";
-	public static final String domain = "tele2-prod";
+	public static final String urls = "tcp://localhost:2506";
+	public static final String domain = "Domain1";
 	
 	public static final String user = "Administrator";
 	public static final String pass = "Administrator";
